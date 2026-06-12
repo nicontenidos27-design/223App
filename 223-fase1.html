@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>223 — Fase 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+:root {
+  --neg: #000000;
+  --bla: #FFFFFF;
+  --gris1: #111111;
+  --gris2: #1C1C1C;
+  --gris3: #2A2A2A;
+  --gris4: #444444;
+  --gris5: #888888;
+  --neon: #FFFFFF;
+  --neon-glow: 0 0 8px rgba(255,255,255,0.9), 0 0 24px rgba(255,255,255,0.4), 0 0 48px rgba(255,255,255,0.15);
+  --neon-glow-sm: 0 0 6px rgba(255,255,255,0.7), 0 0 16px rgba(255,255,255,0.25);
+  --font-d: 'Unbounded', sans-serif;
+  --font-b: 'Space Grotesk', sans-serif;
+}
+
+body {
+  background: #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: var(--font-b);
+}
+
+/* ── PHONE ── */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--neg);
+  border-radius: 50px;
+  border: 1.5px solid #222;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 1px #111, 0 30px 80px rgba(0,0,0,0.9);
+}
+
+/* ── SCREENS ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  background: var(--neg);
+}
+.screen.active { display: flex; }
+
+/* ════════════════════════════
+   P-01 SPLASH
+════════════════════════════ */
+#s-splash {
+  align-items: center;
+  justify-content: center;
+}
+.splash-num {
+  font-family: var(--font-d);
+  font-size: 80px;
+  font-weight: 900;
+  color: var(--bla);
+  letter-spacing: 3px;
+  opacity: 0;
+  animation: splashIn 1.4s cubic-bezier(.16,1,.3,1) .3s forwards;
+  text-shadow: var(--neon-glow);
+}
+@keyframes splashIn {
+  0%   { opacity:0; transform:scale(.85); filter:blur(14px); }
+  60%  { opacity:1; filter:blur(0); }
+  100% { opacity:1; transform:scale(1); }
+}
+
+/* ════════════════════════════
+   P-02 ELECCIÓN ROL
+════════════════════════════ */
+#s-rol {
+  flex-direction: row;
+}
+.rol-lado {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  cursor: pointer;
+  position: relative;
+  transition: background .25s;
+}
+.rol-lado:active { background: #0D0D0D; }
+.rol-divider {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--gris3);
+  z-index: 5;
+}
+.rol-logo {
+  position: absolute;
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-d);
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--bla);
+  letter-spacing: 2px;
+  text-shadow: var(--neon-glow-sm);
+  z-index: 10;
+  white-space: nowrap;
+}
+.rol-icon {
+  font-size: 44px;
+  margin-top: 60px;
+}
+.rol-titulo {
+  font-family: var(--font-d);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--bla);
+  letter-spacing: 2px;
+  text-align: center;
+}
+.rol-sub {
+  font-size: 11px;
+  color: var(--gris5);
+  text-align: center;
+  padding: 0 24px;
+  line-height: 1.5;
+}
+.rol-btn {
+  margin-top: 12px;
+  padding: 10px 24px;
+  border: 1px solid var(--gris3);
+  border-radius: 24px;
+  background: transparent;
+  color: var(--gris5);
+  font-size: 11px;
+  font-family: var(--font-b);
+  cursor: pointer;
+  transition: all .2s;
+}
+.rol-lado:hover .rol-btn,
+.rol-lado:active .rol-btn {
+  border-color: var(--bla);
+  color: var(--bla);
+  box-shadow: var(--neon-glow-sm);
+}
+
+/* ════════════════════════════
+   P-03a REGISTRO JUGADOR
+════════════════════════════ */
+.form-screen {
+  padding: 0;
+}
+.form-header {
+  padding: 52px 24px 28px;
+  border-bottom: 1px solid var(--gris2);
+}
+.form-back {
+  font-size: 18px;
+  color: var(--gris5);
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+.form-title {
+  font-family: var(--font-d);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--bla);
+  margin-bottom: 6px;
+  text-shadow: var(--neon-glow-sm);
+}
+.form-sub {
+  font-size: 13px;
+  color: var(--gris5);
+}
+.form-body {
+  flex: 1;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.campo label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gris5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.campo input {
+  background: var(--gris1);
+  border: 1px solid var(--gris3);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: var(--bla);
+  font-size: 15px;
+  font-family: var(--font-b);
+  outline: none;
+  transition: border-color .2s;
+}
+.campo input:focus {
+  border-color: var(--bla);
+  box-shadow: var(--neon-glow-sm);
+}
+.campo input::placeholder { color: var(--gris4); }
+.btn-primario {
+  width: 100%;
+  padding: 16px;
+  background: var(--bla);
+  color: var(--neg);
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-d);
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: var(--neon-glow-sm);
+  margin-top: 8px;
+  transition: opacity .2s;
+}
+.btn-primario:active { opacity: .8; }
+.btn-google {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--gris5);
+  border: 1px solid var(--gris3);
+  border-radius: 14px;
+  font-size: 14px;
+  font-family: var(--font-b);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all .2s;
+}
+.btn-google:active { border-color: var(--bla); color: var(--bla); }
+.separador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--gris4);
+  font-size: 12px;
+}
+.separador::before,
+.separador::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gris3);
+}
+
+/* ════════════════════════════
+   P-04 MAPA PRINCIPAL
+════════════════════════════ */
+#s-mapa { background: var(--neg); }
+
+.top-bar {
+  background: var(--neg);
+  padding: 48px 20px 0;
+  flex-shrink: 0;
+  z-index: 20;
+}
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+}
+.logo {
+  font-family: var(--font-d);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--bla);
+  letter-spacing: 2px;
+  text-shadow: var(--neon-glow-sm);
+}
+.hdr-icons { display:flex; gap:10px; }
+.ic-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--gris1);
+  border: 1px solid var(--gris3);
+  color: var(--bla);
+  font-size: 15px;
+  display: flex; align-items:center; justify-content:center;
+  cursor: pointer;
+}
+.filtros {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: none;
+}
+.filtros::-webkit-scrollbar { display:none; }
+.filtro {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--gris3);
+  background: transparent;
+  color: var(--gris5);
+  font-family: var(--font-b);
+  transition: all .2s;
+  letter-spacing: .5px;
+}
+.filtro.on {
+  background: var(--bla);
+  color: var(--neg);
+  border-color: var(--bla);
+  box-shadow: var(--neon-glow-sm);
+}
+
+/* mapa leaflet */
+.mapa-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+#leaflet { width:100%; height:100%; }
+.leaflet-control-zoom { display:none !important; }
+.leaflet-control-attribution { font-size:8px !important; opacity:.3; }
+
+/* pins */
+.pin-w {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pin-b {
+  background: var(--neg);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 4px 16px rgba(0,0,0,0.7);
+  cursor: pointer;
+  transition: all .2s;
+}
+.pin-b:hover, .pin-b:active {
+  border-color: var(--bla);
+  box-shadow: var(--neon-glow-sm);
+}
+.pin-b.mision  { border-color: rgba(255,255,255,0.5); }
+.pin-b.evento  { border-color: rgba(255,255,255,0.35); }
+.pin-b.local   { border-color: rgba(255,255,255,0.2); }
+.pin-icon  { font-size:12px; }
+.pin-label { font-size:11px; font-weight:600; color:var(--bla); font-family:var(--font-b); }
+.pin-t { width:1.5px; height:7px; background:rgba(255,255,255,0.3); }
+.pin-d { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.3); }
+
+/* user dot */
+.udot-wrap { position:relative; }
+.udot-pulse {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:36px; height:36px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.07);
+  animation:pulse 2s ease-out infinite;
+}
+@keyframes pulse {
+  0%  { transform:translate(-50%,-50%) scale(.4); opacity:1; }
+  100%{ transform:translate(-50%,-50%) scale(2.2); opacity:0; }
+}
+.udot-inner {
+  width:13px; height:13px;
+  background:var(--bla);
+  border-radius:50%;
+  border:2px solid var(--neg);
+  box-shadow: var(--neon-glow-sm);
+  position:relative; z-index:2;
+}
+
+/* card preview */
+.card-prev {
+  position:absolute;
+  bottom:0; left:0; right:0;
+  background: var(--gris1);
+  border-top: 1px solid var(--gris3);
+  border-radius: 24px 24px 0 0;
+  padding: 16px 20px 24px;
+  z-index: 30;
+  transform: translateY(100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+.card-prev.show { transform: translateY(0); }
+.card-handle {
+  width:36px; height:4px;
+  background: var(--gris3);
+  border-radius:2px;
+  margin: 0 auto 16px;
+  cursor:pointer;
+}
+.card-tipo {
+  font-family: var(--font-d);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gris5);
+  margin-bottom: 6px;
+}
+.card-titulo {
+  font-family: var(--font-d);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--bla);
+  margin-bottom: 8px;
+  text-shadow: var(--neon-glow-sm);
+}
+.card-desc {
+  font-size: 13px;
+  color: var(--gris5);
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+.card-meta {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.card-mi {
+  font-size: 11px;
+  color: var(--gris4);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* bottom nav */
+.bot-nav {
+  height: 80px;
+  background: var(--neg);
+  border-top: 1px solid var(--gris2);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px 14px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+}
+.nav-i {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 12px;
+  transition: background .2s;
+}
+.nav-i.on { background: rgba(255,255,255,0.04); }
+.nav-ico { font-size:20px; opacity:.25; transition:opacity .2s; }
+.nav-i.on .nav-ico { opacity:1; }
+.nav-lbl {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--gris4);
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  transition: color .2s;
+}
+.nav-i.on .nav-lbl { color: var(--bla); }
+.nav-i.center {
+  background: var(--bla);
+  border-radius: 18px;
+  padding: 10px 16px;
+  margin-top: -18px;
+  box-shadow: var(--neon-glow-sm);
+}
+.nav-i.center .nav-ico { opacity:1; font-size:22px; }
+.nav-i.center .nav-lbl { color: var(--neg); }
+
+/* ════════════════════════════
+   P-05 DETALLE MISIÓN
+════════════════════════════ */
+#s-detalle { overflow: hidden; }
+.det-header {
+  padding: 52px 20px 20px;
+  background: var(--neg);
+  border-bottom: 1px solid var(--gris2);
+  flex-shrink: 0;
+}
+.det-back {
+  font-size: 18px;
+  color: var(--gris5);
+  cursor: pointer;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+.det-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid var(--gris3);
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gris5);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-family: var(--font-d);
+}
+.det-titulo {
+  font-family: var(--font-d);
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--bla);
+  margin-bottom: 6px;
+  text-shadow: var(--neon-glow-sm);
+  line-height: 1.2;
+}
+.det-creador {
+  font-size: 12px;
+  color: var(--gris5);
+}
+.det-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.det-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.det-stat {
+  background: var(--gris1);
+  border: 1px solid var(--gris3);
+  border-radius: 14px;
+  padding: 14px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.det-stat-val {
+  font-family: var(--font-d);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--bla);
+}
+.det-stat-lbl {
+  font-size: 10px;
+  color: var(--gris5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.det-desc-titulo {
+  font-family: var(--font-d);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gris5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.det-desc-txt {
+  font-size: 14px;
+  color: var(--gris5);
+  line-height: 1.6;
+}
+.premios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.premio-item {
+  background: var(--gris1);
+  border: 1px solid var(--gris3);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.premio-ico { font-size: 24px; }
+.premio-info { flex:1; }
+.premio-nombre { font-size: 14px; font-weight: 600; color: var(--bla); }
+.premio-pts { font-size: 12px; color: var(--gris5); margin-top: 2px; }
+.det-footer {
+  padding: 16px 20px 32px;
+  background: var(--neg);
+  border-top: 1px solid var(--gris2);
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════
+   P-06 LISTA MISIONES
+════════════════════════════ */
+#s-misiones { overflow: hidden; }
+.mis-header {
+  padding: 52px 20px 20px;
+  background: var(--neg);
+  border-bottom: 1px solid var(--gris2);
+  flex-shrink: 0;
+}
+.mis-back {
+  font-size: 18px;
+  color: var(--gris5);
+  cursor: pointer;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+.mis-juego-nombre {
+  font-family: var(--font-d);
+  font-size: 11px;
+  color: var(--gris5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.mis-titulo {
+  font-family: var(--font-d);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--bla);
+  text-shadow: var(--neon-glow-sm);
+}
+.mis-body {
+  flex:1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mis-item {
+  background: var(--gris1);
+  border: 1px solid var(--gris3);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+}
+.mis-item.disponible:active {
+  border-color: var(--bla);
+  box-shadow: var(--neon-glow-sm);
+}
+.mis-item.bloqueada { opacity: .4; cursor: default; }
+.mis-item.completada { opacity: .6; }
+.mis-num {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--gris2);
+  border: 1px solid var(--gris3);
+  display: flex; align-items:center; justify-content:center;
+  font-family: var(--font-d);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gris5);
+  flex-shrink: 0;
+}
+.mis-item.disponible .mis-num {
+  background: var(--bla);
+  border-color: var(--bla);
+  color: var(--neg);
+  box-shadow: var(--neon-glow-sm);
+}
+.mis-item.completada .mis-num {
+  background: var(--gris2);
+  color: var(--bla);
+}
+.mis-info { flex:1; }
+.mis-nombre { font-size: 14px; font-weight: 600; color: var(--bla); margin-bottom: 3px; }
+.mis-pista { font-size: 12px; color: var(--gris5); line-height: 1.4; }
+.mis-pts {
+  font-family: var(--font-d);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gris5);
+}
+.mis-item.disponible .mis-pts { color: var(--bla); }
+.mis-check { font-size: 16px; position:absolute; top:12px; right:14px; }
+
+/* ════════════════════════════
+   P-07 MISIÓN ACTIVA NAV
+════════════════════════════ */
+#s-nav { overflow: hidden; }
+.nav-header {
+  padding: 52px 20px 20px;
+  background: var(--neg);
+  border-bottom: 1px solid var(--gris2);
+  flex-shrink: 0;
+}
+.nav-back {
+  font-size: 18px;
+  color: var(--gris5);
+  cursor: pointer;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+.nav-mis-num {
+  font-family: var(--font-d);
+  font-size: 10px;
+  color: var(--gris5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.nav-mis-titulo {
+  font-family: var(--font-d);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--bla);
+  text-shadow: var(--neon-glow-sm);
+}
+.nav-mapa-wrap { flex:1; position:relative; overflow:hidden; }
+#leaflet-nav { width:100%; height:100%; }
+.nav-pista-box {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--gris1);
+  border-top: 1px solid var(--gris3);
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px 32px;
+  z-index: 30;
+}
+.nav-pista-lbl {
+  font-family: var(--font-d);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gris5);
+  margin-bottom: 8px;
+}
+.nav-pista-txt {
+  font-size: 14px;
+  color: var(--bla);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.nav-dist {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.nav-dist-num {
+  font-family: var(--font-d);
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--bla);
+  text-shadow: var(--neon-glow-sm);
+}
+.nav-dist-lbl { font-size: 12px; color: var(--gris5); }
+
+/* ════════════════════════════
+   P-09 COMPLETADA
+════════════════════════════ */
+#s-completada {
+  align-items: center;
+  justify-content: center;
+  padding: 40px 28px;
+  text-align: center;
+}
+.comp-circle {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  border: 2px solid var(--bla);
+  box-shadow: var(--neon-glow);
+  display: flex; align-items:center; justify-content:center;
+  font-size: 50px;
+  margin-bottom: 32px;
+  animation: compIn .6s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes compIn {
+  0%  { transform: scale(.6); opacity:0; }
+  100%{ transform: scale(1);  opacity:1; }
+}
+.comp-pts {
+  font-family: var(--font-d);
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--bla);
+  text-shadow: var(--neon-glow);
+  margin-bottom: 4px;
+}
+.comp-pts-lbl {
+  font-family: var(--font-d);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gris5);
+  margin-bottom: 28px;
+}
+.comp-titulo {
+  font-family: var(--font-d);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--bla);
+  margin-bottom: 10px;
+  text-shadow: var(--neon-glow-sm);
+}
+.comp-desc {
+  font-size: 14px;
+  color: var(--gris5);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+.comp-codigo {
+  background: var(--gris1);
+  border: 1px solid var(--gris3);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  width: 100%;
+}
+.comp-codigo-lbl {
+  font-size: 10px;
+  color: var(--gris5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-family: var(--font-d);
+}
+.comp-codigo-val {
+  font-family: var(--font-d);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--bla);
+  letter-spacing: 6px;
+  text-shadow: var(--neon-glow-sm);
+}
+.comp-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.btn-sec {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--gris5);
+  border: 1px solid var(--gris3);
+  border-radius: 14px;
+  font-size: 14px;
+  font-family: var(--font-b);
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-sec:active { border-color: var(--bla); color: var(--bla); }
+
+/* ════════════════════════════
+   P-09b RANKING
+════════════════════════════ */
+#s-ranking { overflow:hidden; }
+.rank-header {
+  padding: 52px 20px 20px;
+  border-bottom: 1px solid var(--gris2);
+  flex-shrink: 0;
+}
+.rank-titulo {
+  font-family: var(--font-d);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--bla);
+  text-shadow: var(--neon-glow-sm);
+}
+.rank-body {
+  flex:1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rank-item {
+  background: var(--gris1);
+  border: 1px solid var(--gris3);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.rank-item.yo {
+  border-color: var(--bla);
+  box-shadow: var(--neon-glow-sm);
+}
+.rank-pos {
+  font-family: var(--font-d);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gris5);
+  width: 24px;
+  text-align: center;
+}
+.rank-item.yo .rank-pos { color: var(--bla); }
+.rank-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--gris2);
+  border: 1px solid var(--gris3);
+  display: flex; align-items:center; justify-content:center;
+  font-size: 18px;
+}
+.rank-info { flex:1; }
+.rank-nombre { font-size: 14px; font-weight: 600; color: var(--bla); }
+.rank-misiones { font-size: 11px; color: var(--gris5); margin-top: 2px; }
+.rank-pts {
+  font-family: var(--font-d);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--bla);
+}
+
+/* ════════════════════════════
+   P-09c PERFIL
+════════════════════════════ */
+#s-perfil { overflow:hidden; }
+.perf-header {
+  padding: 52px 20px 24px;
+  border-bottom: 1px solid var(--gris2);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+.perf-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: var(--gris1);
+  border: 2px solid var(--bla);
+  box-shadow: var(--neon-glow-sm);
+  display: flex; align-items:center; justify-content:center;
+  font-size: 32px;
+}
+.perf-nombre {
+  font-family: var(--font-d);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--bla);
+  text-shadow: var(--neon-glow-sm);
+}
+.perf-handle { font-size: 13px; color: var(--gris5); }
+.perf-body {
+  flex:1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.perf-stats {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 10px;
+}
+.perf-stat {
+  background: var(--gris1);
+  border: 1px solid var(--gris3);
+  border-radius: 14px;
+  padding: 14px 8px;
+  text-align: center;
+}
+.perf-stat-val {
+  font-family: var(--font-d);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--bla);
+  text-shadow: var(--neon-glow-sm);
+}
+.perf-stat-lbl {
+  font-size: 10px;
+  color: var(--gris5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+.perf-seccion-titulo {
+  font-family: var(--font-d);
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gris5);
+  margin-bottom: 8px;
+}
+.hist-item {
+  background: var(--gris1);
+  border: 1px solid var(--gris3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.hist-ico { font-size: 20px; }
+.hist-info { flex:1; }
+.hist-nombre { font-size: 13px; font-weight: 600; color: var(--bla); }
+.hist-fecha { font-size: 11px; color: var(--gris5); margin-top: 2px; }
+.hist-pts { font-family: var(--font-d); font-size: 13px; font-weight: 700; color: var(--bla); }
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- ═══ P-01 SPLASH ═══ -->
+<div class="screen active" id="s-splash">
+  <div class="splash-num">223</div>
+</div>
+
+<!-- ═══ P-02 ROL ═══ -->
+<div class="screen" id="s-rol">
+  <div class="rol-logo">223</div>
+  <div class="rol-divider"></div>
+  <div class="rol-lado" onclick="ir('s-registro')">
+    <div class="rol-icon">🎯</div>
+    <div class="rol-titulo">JUGAR</div>
+    <div class="rol-sub">Explorá la ciudad, completá misiones y ganá premios reales.</div>
+    <button class="rol-btn">Registrarme gratis</button>
+  </div>
+  <div class="rol-lado" onclick="ir('s-creador-info')">
+    <div class="rol-icon">⚡</div>
+    <div class="rol-titulo">CREAR</div>
+    <div class="rol-sub">Creá tu propia campaña de juego para tu marca o evento.</div>
+    <button class="rol-btn">Ver planes</button>
+  </div>
+</div>
+
+<!-- ═══ P-03a REGISTRO JUGADOR ═══ -->
+<div class="screen form-screen" id="s-registro">
+  <div class="form-header">
+    <span class="form-back" onclick="ir('s-rol')">← </span>
+    <div class="form-title">Crear cuenta</div>
+    <div class="form-sub">Gratis. Sin tarjeta.</div>
+  </div>
+  <div class="form-body">
+    <div class="campo">
+      <label>Nombre de usuario</label>
+      <input type="text" placeholder="como te van a ver los demás">
+    </div>
+    <div class="campo">
+      <label>Email</label>
+      <input type="email" placeholder="tu@email.com">
+    </div>
+    <div class="campo">
+      <label>Contraseña</label>
+      <input type="password" placeholder="mínimo 8 caracteres">
+    </div>
+    <button class="btn-primario" onclick="ir('s-mapa')">Crear cuenta →</button>
+    <div class="separador">o</div>
+    <button class="btn-google" onclick="ir('s-mapa')">
+      <span>G</span> Continuar con Google
+    </button>
+  </div>
+</div>
+
+<!-- ═══ PANTALLA CREADOR (placeholder) ═══ -->
+<div class="screen form-screen" id="s-creador-info">
+  <div class="form-header">
+    <span class="form-back" onclick="ir('s-rol')">← </span>
+    <div class="form-title">Crear campaña</div>
+    <div class="form-sub">Verificación + suscripción mensual</div>
+  </div>
+  <div class="form-body">
+    <div class="campo">
+      <label>Nombre del negocio / evento</label>
+      <input type="text" placeholder="Color Humano Festival">
+    </div>
+    <div class="campo">
+      <label>CUIT o DNI</label>
+      <input type="text" placeholder="20-12345678-9">
+    </div>
+    <div class="campo">
+      <label>Instagram o sitio web</label>
+      <input type="text" placeholder="@tuempresa">
+    </div>
+    <button class="btn-primario" onclick="ir('s-mapa')">Ver planes y pagar →</button>
+  </div>
+</div>
+
+<!-- ═══ P-04 MAPA ═══ -->
+<div class="screen" id="s-mapa">
+  <div class="top-bar">
+    <div class="header-row">
+      <div class="logo">223</div>
+      <div class="hdr-icons">
+        <div class="ic-btn">🔔</div>
+        <div class="ic-btn" onclick="ir('s-perfil')">👤</div>
+      </div>
+    </div>
+    <div class="filtros">
+      <button class="filtro on">Todo</button>
+      <button class="filtro">🎯 Misiones</button>
+      <button class="filtro">🎪 Eventos</button>
+      <button class="filtro">🏪 Locales</button>
+      <button class="filtro">⚡ Activos</button>
+    </div>
+  </div>
+  <div class="mapa-wrap">
+    <div id="leaflet"></div>
+    <!-- card preview -->
+    <div class="card-prev" id="cardPrev">
+      <div class="card-handle" onclick="cerrarCard()"></div>
+      <div class="card-tipo" id="cTipo">MISIÓN ACTIVA</div>
+      <div class="card-titulo" id="cTitulo">La Seña del Puerto</div>
+      <div class="card-desc" id="cDesc">Encontrá la pista oculta en la Escollera Sur.</div>
+      <div class="card-meta" id="cMeta"></div>
+      <button class="btn-primario" onclick="ir('s-detalle')">Ver misión →</button>
+    </div>
+  </div>
+  <div class="bot-nav">
+    <div class="nav-i on" onclick="ir('s-mapa')">
+      <div class="nav-ico">🗺️</div>
+      <div class="nav-lbl">Mapa</div>
+    </div>
+    <div class="nav-i" onclick="ir('s-misiones')">
+      <div class="nav-ico">🎯</div>
+      <div class="nav-lbl">Misiones</div>
+    </div>
+    <div class="nav-i center">
+      <div class="nav-ico">＋</div>
+      <div class="nav-lbl">Crear</div>
+    </div>
+    <div class="nav-i" onclick="ir('s-ranking')">
+      <div class="nav-ico">🏆</div>
+      <div class="nav-lbl">Ranking</div>
+    </div>
+    <div class="nav-i" onclick="ir('s-perfil')">
+      <div class="nav-ico">👤</div>
+      <div class="nav-lbl">Perfil</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ P-05 DETALLE ═══ -->
+<div class="screen" id="s-detalle">
+  <div class="det-header">
+    <span class="det-back" onclick="ir('s-mapa')">← </span>
+    <div class="det-badge">Misión activa</div>
+    <div class="det-titulo">La Seña del Puerto</div>
+    <div class="det-creador">por Color Humano Festival</div>
+  </div>
+  <div class="det-body">
+    <div class="det-stats">
+      <div class="det-stat">
+        <div class="det-stat-val">150</div>
+        <div class="det-stat-lbl">Puntos</div>
+      </div>
+      <div class="det-stat">
+        <div class="det-stat-val">34</div>
+        <div class="det-stat-lbl">Jugadores</div>
+      </div>
+      <div class="det-stat">
+        <div class="det-stat-val">2h</div>
+        <div class="det-stat-lbl">Restantes</div>
+      </div>
+    </div>
+    <div>
+      <div class="det-desc-titulo">La misión</div>
+      <div class="det-desc-txt">Llegá a la Escollera Sur antes de las 22hs. Cuando estés en el lugar, activá la cámara y encontrá el objeto escondido. La seña te aparecerá al llegar.</div>
+    </div>
+    <div>
+      <div class="det-desc-titulo">Premios disponibles</div>
+      <div class="premios-lista">
+        <div class="premio-item">
+          <div class="premio-ico">🎫</div>
+          <div class="premio-info">
+            <div class="premio-nombre">Entrada al festival</div>
+            <div class="premio-pts">150 puntos · 5 disponibles</div>
+          </div>
+        </div>
+        <div class="premio-item">
+          <div class="premio-ico">☕</div>
+          <div class="premio-info">
+            <div class="premio-nombre">Café gratis en Vintage</div>
+            <div class="premio-pts">50 puntos · 20 disponibles</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="det-footer">
+    <button class="btn-primario" onclick="ir('s-misiones')">Ver misiones del juego →</button>
+  </div>
+</div>
+
+<!-- ═══ P-06 LISTA MISIONES ═══ -->
+<div class="screen" id="s-misiones">
+  <div class="mis-header">
+    <span class="mis-back" onclick="ir('s-detalle')">← </span>
+    <div class="mis-juego-nombre">Color Humano Festival</div>
+    <div class="mis-titulo">Misiones</div>
+  </div>
+  <div class="mis-body">
+    <div class="mis-item completada">
+      <div class="mis-num">✓</div>
+      <div class="mis-info">
+        <div class="mis-nombre">El Inicio</div>
+        <div class="mis-pista">Registrate y llegá al punto de inicio del festival.</div>
+      </div>
+      <div class="mis-pts">50 pts</div>
+      <div class="mis-check">✓</div>
+    </div>
+    <div class="mis-item disponible" onclick="ir('s-nav')">
+      <div class="mis-num">2</div>
+      <div class="mis-info">
+        <div class="mis-nombre">La Seña del Puerto</div>
+        <div class="mis-pista">Algo te espera en la escollera al caer el sol...</div>
+      </div>
+      <div class="mis-pts">150 pts</div>
+    </div>
+    <div class="mis-item bloqueada">
+      <div class="mis-num">3</div>
+      <div class="mis-info">
+        <div class="mis-nombre">El Faro Perdido</div>
+        <div class="mis-pista">🔒 Completá la misión anterior para desbloquear</div>
+      </div>
+      <div class="mis-pts">200 pts</div>
+    </div>
+    <div class="mis-item bloqueada">
+      <div class="mis-num">4</div>
+      <div class="mis-info">
+        <div class="mis-nombre">El Encuentro Final</div>
+        <div class="mis-pista">🔒 Bloqueada</div>
+      </div>
+      <div class="mis-pts">300 pts</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ P-07 NAV MISIÓN ═══ -->
+<div class="screen" id="s-nav">
+  <div class="nav-header">
+    <span class="nav-back" onclick="ir('s-misiones')">← </span>
+    <div class="nav-mis-num">Misión 2 de 4</div>
+    <div class="nav-mis-titulo">La Seña del Puerto</div>
+  </div>
+  <div class="nav-mapa-wrap">
+    <div id="leaflet-nav"></div>
+    <div class="nav-pista-box">
+      <div class="nav-pista-lbl">La pista</div>
+      <div class="nav-pista-txt">Algo te espera en la escollera al caer el sol. Buscá donde terminan las piedras y empieza el mar.</div>
+      <div class="nav-dist">
+        <div class="nav-dist-num">380</div>
+        <div class="nav-dist-lbl">metros aprox.</div>
+      </div>
+      <button class="btn-primario" onclick="iniciarAR()">Activar cámara AR →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ P-09 COMPLETADA ═══ -->
+<div class="screen" id="s-completada">
+  <div class="comp-circle">🎯</div>
+  <div class="comp-pts">+150</div>
+  <div class="comp-pts-lbl">Puntos ganados</div>
+  <div class="comp-titulo">¡Misión completada!</div>
+  <div class="comp-desc">Encontraste el objeto en la Escollera Sur. Tu código de premio está listo para canjear.</div>
+  <div class="comp-codigo">
+    <div class="comp-codigo-lbl">Código de canje</div>
+    <div class="comp-codigo-val">223–8F4K</div>
+  </div>
+  <div class="comp-btns">
+    <button class="btn-primario" onclick="ir('s-misiones')">Siguiente misión →</button>
+    <button class="btn-sec" onclick="ir('s-mapa')">Volver al mapa</button>
+  </div>
+</div>
+
+<!-- ═══ P-09b RANKING ═══ -->
+<div class="screen" id="s-ranking">
+  <div class="rank-header">
+    <div class="rank-titulo">Ranking</div>
+  </div>
+  <div class="rank-body">
+    <div class="rank-item">
+      <div class="rank-pos">1</div>
+      <div class="rank-avatar">🦅</div>
+      <div class="rank-info">
+        <div class="rank-nombre">agustina.mdq</div>
+        <div class="rank-misiones">12 misiones completadas</div>
+      </div>
+      <div class="rank-pts">1840</div>
+    </div>
+    <div class="rank-item">
+      <div class="rank-pos">2</div>
+      <div class="rank-avatar">🐺</div>
+      <div class="rank-info">
+        <div class="rank-nombre">elchori223</div>
+        <div class="rank-misiones">10 misiones completadas</div>
+      </div>
+      <div class="rank-pts">1520</div>
+    </div>
+    <div class="rank-item">
+      <div class="rank-pos">3</div>
+      <div class="rank-avatar">🌊</div>
+      <div class="rank-info">
+        <div class="rank-nombre">surfer.baires</div>
+        <div class="rank-misiones">9 misiones completadas</div>
+      </div>
+      <div class="rank-pts">1380</div>
+    </div>
+    <div class="rank-item yo">
+      <div class="rank-pos">7</div>
+      <div class="rank-avatar">⭐</div>
+      <div class="rank-info">
+        <div class="rank-nombre">vos</div>
+        <div class="rank-misiones">3 misiones completadas</div>
+      </div>
+      <div class="rank-pts">320</div>
+    </div>
+    <div class="rank-item">
+      <div class="rank-pos">8</div>
+      <div class="rank-avatar">🎸</div>
+      <div class="rank-info">
+        <div class="rank-nombre">lauti.beats</div>
+        <div class="rank-misiones">2 misiones completadas</div>
+      </div>
+      <div class="rank-pts">280</div>
+    </div>
+  </div>
+  <div class="bot-nav">
+    <div class="nav-i" onclick="ir('s-mapa')">
+      <div class="nav-ico">🗺️</div><div class="nav-lbl">Mapa</div>
+    </div>
+    <div class="nav-i" onclick="ir('s-misiones')">
+      <div class="nav-ico">🎯</div><div class="nav-lbl">Misiones</div>
+    </div>
+    <div class="nav-i center">
+      <div class="nav-ico">＋</div><div class="nav-lbl">Crear</div>
+    </div>
+    <div class="nav-i on">
+      <div class="nav-ico">🏆</div><div class="nav-lbl">Ranking</div>
+    </div>
+    <div class="nav-i" onclick="ir('s-perfil')">
+      <div class="nav-ico">👤</div><div class="nav-lbl">Perfil</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ P-09c PERFIL ═══ -->
+<div class="screen" id="s-perfil">
+  <div class="perf-header">
+    <div class="perf-avatar">⭐</div>
+    <div class="perf-nombre">José Carrizo</div>
+    <div class="perf-handle">@josemdq</div>
+  </div>
+  <div class="perf-body">
+    <div class="perf-stats">
+      <div class="perf-stat">
+        <div class="perf-stat-val">320</div>
+        <div class="perf-stat-lbl">Puntos</div>
+      </div>
+      <div class="perf-stat">
+        <div class="perf-stat-val">3</div>
+        <div class="perf-stat-lbl">Misiones</div>
+      </div>
+      <div class="perf-stat">
+        <div class="perf-stat-val">2</div>
+        <div class="perf-stat-lbl">Premios</div>
+      </div>
+    </div>
+    <div>
+      <div class="perf-seccion-titulo">Historial reciente</div>
+      <div class="hist-item">
+        <div class="hist-ico">🎯</div>
+        <div class="hist-info">
+          <div class="hist-nombre">La Seña del Puerto</div>
+          <div class="hist-fecha">Hoy · Color Humano</div>
+        </div>
+        <div class="hist-pts">+150</div>
+      </div>
+      <div class="hist-item">
+        <div class="hist-ico">🎯</div>
+        <div class="hist-info">
+          <div class="hist-nombre">El Inicio</div>
+          <div class="hist-fecha">Hoy · Color Humano</div>
+        </div>
+        <div class="hist-pts">+50</div>
+      </div>
+      <div class="hist-item">
+        <div class="hist-ico">☕</div>
+        <div class="hist-info">
+          <div class="hist-nombre">Café gratis canjeado</div>
+          <div class="hist-fecha">Ayer · Café Vintage</div>
+        </div>
+        <div class="hist-pts">−50</div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-nav">
+    <div class="nav-i" onclick="ir('s-mapa')">
+      <div class="nav-ico">🗺️</div><div class="nav-lbl">Mapa</div>
+    </div>
+    <div class="nav-i" onclick="ir('s-misiones')">
+      <div class="nav-ico">🎯</div><div class="nav-lbl">Misiones</div>
+    </div>
+    <div class="nav-i center">
+      <div class="nav-ico">＋</div><div class="nav-lbl">Crear</div>
+    </div>
+    <div class="nav-i" onclick="ir('s-ranking')">
+      <div class="nav-ico">🏆</div><div class="nav-lbl">Ranking</div>
+    </div>
+    <div class="nav-i on">
+      <div class="nav-ico">👤</div><div class="nav-lbl">Perfil</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ P-08 REALIDAD AUMENTADA ═══ -->
+<div class="screen" id="s-ar" style="position:relative;overflow:hidden;background:#000;">
+
+  <div id="ar-overlay" style="position:absolute;inset:0;z-index:100;display:flex;flex-direction:column;pointer-events:none;">
+
+    <div style="padding:48px 20px 16px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(0,0,0,0.75) 0%,transparent 100%);pointer-events:all;">
+      <span onclick="detenerAR()" style="font-size:18px;color:rgba(255,255,255,0.7);cursor:pointer;padding:8px;">←</span>
+      <div style="font-family:'Unbounded',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.55);text-transform:uppercase;">Modo AR · Misión 2</div>
+      <div style="width:34px;"></div>
+    </div>
+
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;position:relative;">
+      <div style="width:80px;height:80px;border:1.5px solid rgba(255,255,255,0.2);border-radius:50%;position:relative;animation:arPulse 2.5s ease-in-out infinite;">
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:6px;background:rgba(255,255,255,0.35);border-radius:50%;"></div>
+      </div>
+    </div>
+
+    <div style="padding:20px 20px 40px;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 100%);pointer-events:all;">
+      <div id="ar-status" style="text-align:center;font-family:'Space Grotesk',sans-serif;font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:16px;">Apuntá la cámara hacia la Escollera Sur...</div>
+      <div style="background:rgba(255,255,255,0.07);border-radius:4px;height:3px;margin-bottom:24px;overflow:hidden;">
+        <div id="ar-barra" style="height:100%;width:0%;background:rgba(255,255,255,0.85);box-shadow:0 0 8px rgba(255,255,255,0.6);border-radius:4px;transition:width .5s ease;"></div>
+      </div>
+      <button id="ar-btn-capturar" onclick="capturarObjeto()" style="width:100%;padding:16px;background:#fff;color:#000;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Unbounded',sans-serif;cursor:pointer;letter-spacing:1px;box-shadow:0 0 8px rgba(255,255,255,0.7),0 0 20px rgba(255,255,255,0.2);display:none;">¡Capturá el objeto! →</button>
+    </div>
+  </div>
+
+  <video id="ar-video" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;"></video>
+  <canvas id="ar-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:50;pointer-events:none;"></canvas>
+</div>
+
+</div><!-- /phone -->
+
+<script>
+// ── NAVEGACIÓN ──
+function ir(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 's-mapa' && !window.mapaIniciado) initMapa();
+  if (id === 's-nav'  && !window.navIniciado)  initNavMapa();
+}
+
+// ── SPLASH AUTO ──
+setTimeout(() => {
+  ir('s-rol');
+}, 2800);
+
+// ── MAPA PRINCIPAL ──
+let mapaIniciado = false;
+function initMapa() {
+  mapaIniciado = true;
+  const map = L.map('leaflet', {
+    center: [-38.0055, -57.5440],
+    zoom: 14,
+    zoomControl: false,
+    attributionControl: true
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO',
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+
+  // user dot
+  const udot = L.divIcon({
+    className:'',
+    html:`<div class="udot-wrap"><div class="udot-pulse"></div><div class="udot-inner"></div></div>`,
+    iconSize:[36,36], iconAnchor:[18,18]
+  });
+  L.marker([-38.0055,-57.5440],{icon:udot}).addTo(map);
+
+  const pins = [
+    { lat:-38.0023, lng:-57.5575, tipo:'evento', ico:'🎪', label:'Color Humano',
+      card:{ tipo:'EVENTO', titulo:'Color Humano', desc:'Festival de bienestar en Bosque Peralta Ramos. Completá las misiones y ganá premios.', meta:[['📍','Peralta Ramos'],['👥','34 jugadores'],['⏱','Esta noche']] }},
+    { lat:-38.0190, lng:-57.5450, tipo:'mision', ico:'🎯', label:'Misión #2',
+      card:{ tipo:'MISIÓN ACTIVA', titulo:'La Seña del Puerto', desc:'Algo te espera en la escollera al caer el sol...', meta:[['📍','Escollera Sur'],['🎯','150 pts'],['👥','8 jugadores']] }},
+    { lat:-38.0050, lng:-57.5420, tipo:'local',  ico:'🏪', label:'Café Vintage',
+      card:{ tipo:'LOCAL PARTICIPANTE', titulo:'Café Vintage', desc:'Pedí "el especial del 223" y recibirás tu próxima pista.', meta:[['📍','San Martín 2340'],['⭐','4.8'],['🎁','Café gratis']] }},
+    { lat:-38.0120, lng:-57.5510, tipo:'mision', ico:'🎯', label:'Misión #3',
+      card:{ tipo:'MISIÓN BLOQUEADA', titulo:'El Faro Perdido', desc:'Completá la Misión #2 para desbloquear esta.', meta:[['📍','Punta Mogotes'],['🎯','200 pts'],['🔒','Bloqueada']] }},
+    { lat:-37.9980, lng:-57.5490, tipo:'evento', ico:'🎵', label:'Muerdo · Live',
+      card:{ tipo:'EVENTO MUSICAL', titulo:'Muerdo en vivo', desc:'Show en Color Humano. Participá del juego previo para conseguir tu lugar en el frente.', meta:[['📍','Peralta Ramos'],['👥','56 jugadores'],['⏱','Esta noche']] }},
+  ];
+
+  pins.forEach(p => {
+    const icon = L.divIcon({
+      className:'',
+      html:`<div class="pin-w"><div class="pin-b ${p.tipo}"><span class="pin-icon">${p.ico}</span><span class="pin-label">${p.label}</span></div><div class="pin-t"></div><div class="pin-d"></div></div>`,
+      iconSize:[130,50], iconAnchor:[65,50]
+    });
+    L.marker([p.lat,p.lng],{icon}).addTo(map).on('click',()=>mostrarCard(p.card));
+  });
+}
+
+function mostrarCard(data) {
+  document.getElementById('cTipo').textContent   = data.tipo;
+  document.getElementById('cTitulo').textContent = data.titulo;
+  document.getElementById('cDesc').textContent   = data.desc;
+  document.getElementById('cMeta').innerHTML = data.meta.map(([i,t])=>`<div class="card-mi">${i} <span>${t}</span></div>`).join('');
+  document.getElementById('cardPrev').classList.add('show');
+}
+function cerrarCard() { document.getElementById('cardPrev').classList.remove('show'); }
+
+// ── MAPA NAVEGACIÓN MISIÓN ──
+let navIniciado = false;
+function initNavMapa() {
+  navIniciado = true;
+  const map2 = L.map('leaflet-nav', {
+    center: [-38.0190,-57.5450],
+    zoom: 15,
+    zoomControl: false,
+    attributionControl: false
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains:'abcd', maxZoom:19
+  }).addTo(map2);
+
+  // radio de búsqueda
+  L.circle([-38.0190,-57.5450], {
+    radius: 80,
+    color: '#000',
+    fillColor: '#000',
+    fillOpacity: 0.08,
+    weight: 1.5,
+    dashArray: '4 4'
+  }).addTo(map2);
+
+  // pin destino
+  const dest = L.divIcon({
+    className:'',
+    html:`<div class="pin-w"><div class="pin-b mision" style="border-color:rgba(255,255,255,0.8);box-shadow:0 0 8px rgba(255,255,255,0.4)"><span class="pin-icon">🎯</span><span class="pin-label">La Seña</span></div><div class="pin-t" style="background:rgba(255,255,255,0.8)"></div><div class="pin-d" style="background:rgba(255,255,255,0.8)"></div></div>`,
+    iconSize:[100,50], iconAnchor:[50,50]
+  });
+  L.marker([-38.0190,-57.5450],{icon:dest}).addTo(map2);
+
+  // user
+  const udot2 = L.divIcon({
+    className:'',
+    html:`<div class="udot-wrap"><div class="udot-pulse"></div><div class="udot-inner"></div></div>`,
+    iconSize:[36,36], iconAnchor:[18,18]
+  });
+  L.marker([-38.0155,-57.5480],{icon:udot2}).addTo(map2);
+}
+
+// ── FILTROS ──
+document.querySelectorAll('.filtro').forEach(f => {
+  f.addEventListener('click', function() {
+    document.querySelectorAll('.filtro').forEach(x => x.classList.remove('on'));
+    this.classList.add('on');
+  });
+});
+
+// ── KEYFRAMES AR (inyectados en runtime) ──
+(function(){
+  const st = document.createElement('style');
+  st.textContent = `
+    @keyframes arPulse {
+      0%,100%{ transform:scale(1); opacity:.4; }
+      50%{ transform:scale(1.15); opacity:.8; }
+    }
+    @keyframes objFloat {
+      0%,100%{ transform:translate(-50%,-60%) scale(1) rotate(-2deg); }
+      50%{ transform:translate(-50%,-68%) scale(1.04) rotate(2deg); }
+    }
+    @keyframes objGlow {
+      0%,100%{ filter:drop-shadow(0 0 8px rgba(255,255,255,0.6)); }
+      50%{ filter:drop-shadow(0 0 20px rgba(255,255,255,1)); }
+    }
+  `;
+  document.head.appendChild(st);
+})();
+
+let arStream = null;
+let arTimer = null;
+let arObjVisible = false;
+
+async function iniciarAR() {
+  ir('s-ar');
+  arObjVisible = false;
+  document.getElementById('ar-btn-capturar').style.display = 'none';
+  document.getElementById('ar-barra').style.width = '0%';
+  document.getElementById('ar-status').textContent = 'Iniciando cámara...';
+
+  // Remover objeto AR previo si existe
+  const prev = document.getElementById('ar-obj');
+  if (prev) prev.remove();
+
+  try {
+    arStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width:{ideal:1280}, height:{ideal:720} },
+      audio: false
+    });
+    document.getElementById('ar-video').srcObject = arStream;
+    document.getElementById('ar-status').textContent = 'Apuntá la cámara hacia la Escollera Sur...';
+    simularProximidadAR();
+  } catch(e) {
+    // Sin cámara (desktop/prototipo) — simular igual con fondo negro
+    document.getElementById('ar-status').textContent = 'Simulando AR (sin cámara disponible)...';
+    simularProximidadAR();
+  }
+}
+
+function simularProximidadAR() {
+  let prog = 0;
+  arTimer = setInterval(() => {
+    prog += Math.random() * 8 + 4;
+    if (prog > 100) prog = 100;
+    document.getElementById('ar-barra').style.width = prog + '%';
+
+    if (prog < 40) {
+      document.getElementById('ar-status').textContent = 'Buscando objeto... mové la cámara';
+    } else if (prog < 75) {
+      document.getElementById('ar-status').textContent = '¡Señal detectada! Acercate un poco más...';
+    } else if (prog < 100) {
+      document.getElementById('ar-status').textContent = '¡Casi! El objeto está muy cerca...';
+    }
+
+    if (prog >= 100 && !arObjVisible) {
+      clearInterval(arTimer);
+      arObjVisible = true;
+      mostrarObjetoAR();
+    }
+  }, 280);
+}
+
+function mostrarObjetoAR() {
+  document.getElementById('ar-status').textContent = '¡Objeto encontrado! Tocá para capturarlo.';
+
+  // Crear el objeto AR sobre el canvas/overlay
+  const overlay = document.getElementById('ar-overlay');
+  const obj = document.createElement('div');
+  obj.id = 'ar-obj';
+  obj.style.cssText = `
+    position:absolute;
+    top:42%;left:50%;
+    transform:translate(-50%,-60%);
+    z-index:200;
+    text-align:center;
+    animation:objFloat 3s ease-in-out infinite, objGlow 2s ease-in-out infinite;
+    pointer-events:none;
+  `;
+
+  // El objeto: logo 223 flotando con halo
+  obj.innerHTML = `
+    <div style="
+      position:relative;
+      display:inline-block;
+    ">
+      <!-- halo exterior -->
+      <div style="
+        position:absolute;top:50%;left:50%;
+        transform:translate(-50%,-50%);
+        width:130px;height:130px;
+        border-radius:50%;
+        border:1px solid rgba(255,255,255,0.15);
+        box-shadow:0 0 30px rgba(255,255,255,0.12),inset 0 0 30px rgba(255,255,255,0.05);
+        animation:arPulse 2s ease-in-out infinite;
+      "></div>
+      <!-- halo medio -->
+      <div style="
+        position:absolute;top:50%;left:50%;
+        transform:translate(-50%,-50%);
+        width:95px;height:95px;
+        border-radius:50%;
+        border:1px solid rgba(255,255,255,0.25);
+      "></div>
+      <!-- objeto central -->
+      <div style="
+        width:80px;height:80px;
+        border-radius:50%;
+        background:rgba(0,0,0,0.75);
+        border:2px solid rgba(255,255,255,0.9);
+        box-shadow:0 0 12px rgba(255,255,255,0.8),0 0 30px rgba(255,255,255,0.3),inset 0 0 20px rgba(255,255,255,0.05);
+        display:flex;align-items:center;justify-content:center;
+        position:relative;z-index:2;
+      ">
+        <span style="
+          font-family:'Unbounded',sans-serif;
+          font-size:18px;font-weight:900;
+          color:#fff;letter-spacing:1px;
+          text-shadow:0 0 8px rgba(255,255,255,0.9),0 0 20px rgba(255,255,255,0.5);
+        ">223</span>
+      </div>
+    </div>
+    <!-- etiqueta debajo -->
+    <div style="
+      margin-top:14px;
+      font-family:'Unbounded',sans-serif;
+      font-size:9px;letter-spacing:3px;
+      color:rgba(255,255,255,0.6);
+      text-transform:uppercase;
+    ">Toca para capturar</div>
+  `;
+
+  overlay.appendChild(obj);
+
+  // Hacer el objeto clickeable
+  obj.style.pointerEvents = 'all';
+  obj.style.cursor = 'pointer';
+  obj.addEventListener('click', capturarObjeto);
+
+  // Mostrar botón también abajo
+  document.getElementById('ar-btn-capturar').style.display = 'block';
+}
+
+function capturarObjeto() {
+  // Flash de captura
+  const flash = document.createElement('div');
+  flash.style.cssText = `
+    position:absolute;inset:0;z-index:300;
+    background:rgba(255,255,255,0.9);
+    animation:flashOut .4s ease forwards;
+    pointer-events:none;
+  `;
+  const st = document.createElement('style');
+  st.textContent = '@keyframes flashOut{0%{opacity:1}100%{opacity:0}}';
+  document.head.appendChild(st);
+  document.getElementById('s-ar').appendChild(flash);
+
+  detenerAR();
+  setTimeout(() => ir('s-completada'), 420);
+}
+
+function detenerAR() {
+  if (arTimer) { clearInterval(arTimer); arTimer = null; }
+  if (arStream) { arStream.getTracks().forEach(t => t.stop()); arStream = null; }
+  const video = document.getElementById('ar-video');
+  if (video) video.srcObject = null;
+  const obj = document.getElementById('ar-obj');
+  if (obj) obj.remove();
+  arObjVisible = false;
+}
+
+</script>
+</body>
+</html>
